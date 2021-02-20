@@ -1,11 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {} from '../mortality-table-model.ts'
 
 @Component({
-  selector: 'app-fetch-data',
-  templateUrl: './fetch-data.component.html'
+  selector: 'makeham-law',
+  templateUrl: './makeham-law.component.html'
 })
-export class FetchDataComponent {
+export class MakehamLawComponent {
   public forecasts: WeatherForecast[];
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {

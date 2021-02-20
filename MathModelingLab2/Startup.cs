@@ -1,6 +1,7 @@
+using MathModelingLab2.Models;
+using MathModelingLab2.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,9 @@ namespace MathModelingLab2
         {
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
+            services.AddTransient<GompertzComputingService>();
+            services.AddTransient<MakehamComputingService>();
+            
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
         }
 
