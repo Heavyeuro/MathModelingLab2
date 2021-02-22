@@ -1,6 +1,13 @@
-﻿namespace MathModelingLab2.Models
+﻿using System.Collections.Generic;
+
+namespace MathModelingLab2.Models
 {
     public class MortalityTableModel
+    {
+        public List<MortalityTableModelRaw> MortalityTableModelRaws { get; set; }
+    }
+    
+    public class MortalityTableModelRaw
     {
         // Age
         public double X { get; set; }
@@ -23,6 +30,7 @@
         
         public double CNx { get; set; }
         
+        // Residual life span
         public double CCx { get; set; }
     }
 }

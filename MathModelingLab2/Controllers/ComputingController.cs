@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MathModelingLab2.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ComputingController : ControllerBase
     {
         private MakehamComputingService _makehamComputingService;
@@ -20,10 +20,12 @@ namespace MathModelingLab2.Controllers
             _makehamComputingService = makehamComputingService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetMortalityTableGompertz(GompertzLawParams gompertzLawParams)
+        [HttpPost("GetMortalityTable")]
+        public async Task<IActionResult> GetMortalityTableGompertz()
         {
-            return await _gompertzComputingService.BuildMortalityTable(gompertzLawParams);
+            var gompertzLawParams = new GompertzLawParams {Alpha = 0.05615, Beta = 0.00273, RatePercents = 0.09};
+            var table = await _gompertzComputingService.BuildMortalityTable(gompertzLawParams);
+            return Ok(table);
         }
 
         [HttpGet]

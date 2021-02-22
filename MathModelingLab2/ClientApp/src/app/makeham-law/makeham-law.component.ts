@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {} from '../mortality-table-model.ts'
+import {} from '../models/mortality-table-model'
 
 @Component({
   selector: 'makeham-law',

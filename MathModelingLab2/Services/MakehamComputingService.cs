@@ -6,9 +6,9 @@ namespace MathModelingLab2.Services
 {
     public class MakehamComputingService
     {
-        public async Task<IEnumerable<MortalityTableModel>> BuildMortalityTable(MakehamLawParams MakehamLawParams)
-        {
-            return 
-        }
+        // public async Task<IEnumerable<MortalityTableModel>> BuildMortalityTable(MakehamLawParams MakehamLawParams)
+        // {
+        //     return 
+        // }
     }
 }
