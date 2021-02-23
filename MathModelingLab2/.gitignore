@@ -48,8 +48,9 @@ dlldata.c
 *.obj
 *.pch
 *.pdb
-*.pgc
+*.png
 *.pgd
+*.pcg
 *.rsp
 *.sbr
 *.tlb

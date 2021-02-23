@@ -28,10 +28,11 @@ namespace MathModelingLab2.Controllers
             return Ok(table);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPlotGompertz(GompertzLawParams gompertzLawParams)
+        [HttpPost("GetPlotGompertz")]
+        public async Task<IActionResult> GetPlotGompertz()
         {
-            string path = await _gompertzComputingService.BuildPlot(gompertzLawParams);
+            var gompertzLawParams = new GompertzLawParams {Alpha = 0.05615, Beta = 0.00273, RatePercents = 0.09};
+            var path = await _gompertzComputingService.BuildPlot(gompertzLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
     }

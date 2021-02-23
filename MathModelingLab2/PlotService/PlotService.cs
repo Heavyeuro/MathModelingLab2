@@ -40,18 +40,16 @@ namespace MathModelingLab2.PlotService
         //     MakePlot($"IntellectualComparison{Name}", plotsIntellectual);
         // }
         
-        private static void MakePlot(string fileName, List<PlotLine> plotLines)
+        public static void MakePlot(string fileName, List<PlotLine> plotLines, string xLabel, string yLabel)
         {
             var plt = new Plot(800, 600);
-
+            plt.XAxis.Label(xLabel);
+            plt.YAxis.Label(yLabel);
             plotLines.ForEach(plotLine => plt.AddScatter(plotLine.XDots, plotLine.YDots, label: plotLine.Label));
 
             plt.Legend();
-            plt.XAxis.TickLabelStyle(rotation: 45);
-            plt.XAxis.ManualTickSpacing(1, ScottPlot.Ticks.DateTimeUnit.Day);
-            plt.XAxis.SetSizeLimit(50);
 
-            plt.SaveFig($"{fileName}.png");
+            plt.SaveFig(fileName);
         }
     }
 }
