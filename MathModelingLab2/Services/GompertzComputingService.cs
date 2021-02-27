@@ -48,12 +48,12 @@ namespace MathModelingLab2.Services
 
         public async Task<List<FittingParameters>> FitParamsTable()
         {
-            return IterateParamsTable(0.05);
+            return IterateParamsTable(0.005, 0.1);
         }
 
         public async Task<FittingParameters> FitParams()
         {
-            return IterateParamsTable(0.0002).MinBy(x => x.AbsoluteError).First();
+            return IterateParamsTable(0.00002, 0.1).MinBy(x => x.AbsoluteError).First();
         }
 
         public async Task<string> BuildPlot(GompertzLawParams gompertzLawParams)
@@ -76,10 +76,9 @@ namespace MathModelingLab2.Services
             return path;
         }
 
-        private List<FittingParameters> IterateParamsTable(double step)
+        private List<FittingParameters> IterateParamsTable(double step, double range)
         {
             var fittingParams = new List<FittingParameters>();
-            var gompertzLawParams = new GompertzLawParams(0.001, 0.001, 0.001);
 
             var bestA = 0.001;
             var bestB = 0.001;
@@ -90,7 +89,7 @@ namespace MathModelingLab2.Services
             for (var j = 0; j < 2; j++)
             {
                 
-                for (var i = 0.0001; i < 1; i = Math.Round(step+i,6))
+                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
                 {
                     var tempError = CompareDataWithRealDataAbsoluteError(temp);
                     
@@ -102,7 +101,7 @@ namespace MathModelingLab2.Services
                     fittingParams.Add(new FittingParameters(temp.ToString(), error));
                 }
                 
-                for (var i = 0.0001; i < 1; i = Math.Round(step+i,6))
+                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
                 {
                     var tempError = CompareDataWithRealDataAbsoluteError(temp);
                     
@@ -112,12 +111,7 @@ namespace MathModelingLab2.Services
                     error = tempError;
                     fittingParams.Add(new FittingParameters(temp.ToString(), error));
                 }
-                
-                gompertzLawParams = new GompertzLawParams(bestA, bestB, bestRate);
             }
-
-            fittingParams.Add(new FittingParameters(gompertzLawParams.ToString(),
-                CompareDataWithRealDataAbsoluteError(gompertzLawParams)));
 
             return fittingParams;
         }
