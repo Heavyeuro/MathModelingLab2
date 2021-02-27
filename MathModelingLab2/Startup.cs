@@ -25,8 +25,8 @@ namespace MathModelingLab2
             services.AddTransient<GompertzComputingService>();
             services.AddTransient<MakehamComputingService>();
             services.AddTransient<RealDataComputingService>();
-            services.AddTransient<PlotService.PlotService>();
-            services.AddTransient<XLSService>();
+            services.AddSingleton<PlotService.PlotService>();
+            services.AddSingleton<XlsService>();
             
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
         }

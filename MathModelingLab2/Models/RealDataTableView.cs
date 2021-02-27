@@ -2,18 +2,7 @@
 
 namespace MathModelingLab2.Models
 {
-    public class RealDataTableView
-    {
-        public IEnumerable<RealDataTableClusters> RealDataTableClustersEnumerable { get; set; }
-
-        public class RealDataTableClusters
-        {
-            public string Sex { get; set; }
-
-            public IEnumerable<RealDataTableViewRaw> RealDataTableViewRaws { get; set; }
-        }
-
-        public class RealDataTableViewRaw
+    public class RealDataTableViewRaw
         {
             // Year #1
             public double Year { get; set; }
@@ -33,5 +22,4 @@ namespace MathModelingLab2.Models
             // Residual life span #9
             public double CCx { get; set; }
         }
-    }
 }

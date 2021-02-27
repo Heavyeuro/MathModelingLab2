@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MathModelingLab2.Models;
 using MathModelingLab2.PlotService;
+using MoreLinq.Extensions;
 
 namespace MathModelingLab2.Services
 {
@@ -12,6 +13,12 @@ namespace MathModelingLab2.Services
     {
         private const int AgeLimit = 100;
         private const int PeopleNumber = 100000;
+        private List<RealDataTableViewRaw> RealData { get; set; }
+
+        public GompertzComputingService()
+        {
+            RealData = XlsService.ReadXls();
+        }
 
         public async Task<MortalityTableModel> BuildMortalityTable(GompertzLawParams gompertzLawParams)
         {
@@ -21,31 +28,109 @@ namespace MathModelingLab2.Services
             };
         }
 
-        public async Task<string> BuildPlot(GompertzLawParams gompertzLawParams)
+        public async Task<string> CompareWithRealDataPlot(GompertzLawParams gompertzLawParams)
         {
-            var path = Directory.GetCurrentDirectory() + $"\\plots\\{Guid.NewGuid()}.png";
-
             var mortalityTableModelRaws = ComputeMortalityTableModelRaws(gompertzLawParams);
 
-            PlotService.PlotService.MakePlot(path , new List<PlotLine>
+            return BuildPlot(new List<PlotLine>
+            {
+                new("Computed Gompertz", mortalityTableModelRaws.Select(x => x.X).ToArray(),
+                    mortalityTableModelRaws.Select(x => x.Lx).ToArray()),
+                new("Real data", RealData.Select(x => x.X).ToArray(),
+                    RealData.Select(x => x.Lx).ToArray())
+            });
+        }
+
+        public async Task<double> CompareWithRealDataAbsoluteError(GompertzLawParams gompertzLawParams)
+        {
+            return CompareDataWithRealDataAbsoluteError(gompertzLawParams);
+        }
+
+        public async Task<List<FittingParameters>> FitParamsTable()
+        {
+            return IterateParamsTable(0.05);
+        }
+
+        public async Task<FittingParameters> FitParams()
+        {
+            return IterateParamsTable(0.0002).MinBy(x => x.AbsoluteError).First();
+        }
+
+        public async Task<string> BuildPlot(GompertzLawParams gompertzLawParams)
+        {
+            var mortalityTableModelRaws = ComputeMortalityTableModelRaws(gompertzLawParams);
+
+            return BuildPlot(new List<PlotLine>
             {
                 new("", mortalityTableModelRaws.Select(x => x.X).ToArray(),
                     mortalityTableModelRaws.Select(x => x.Lx).ToArray())
-            }, "Age(years)","Alive number");
+            });
+        }
+
+        private static string BuildPlot(List<PlotLine> plotLines)
+        {
+            var path = Directory.GetCurrentDirectory() + $"\\plots\\{Guid.NewGuid()}.png";
+
+            PlotService.PlotService.MakePlot(path, plotLines, "Age(years)", "Alive number");
 
             return path;
         }
 
+        private List<FittingParameters> IterateParamsTable(double step)
+        {
+            var fittingParams = new List<FittingParameters>();
+            var gompertzLawParams = new GompertzLawParams(0.001, 0.001, 0.001);
+
+            var bestA = 0.001;
+            var bestB = 0.001;
+            var bestRate =  0.001;
+            var temp = new GompertzLawParams(bestA, bestB, bestRate);
+            var error = 1.0;
+
+            for (var j = 0; j < 2; j++)
+            {
+                
+                for (var i = 0.0001; i < 1; i = Math.Round(step+i,6))
+                {
+                    var tempError = CompareDataWithRealDataAbsoluteError(temp);
+                    
+                    if (tempError > error && !double.IsNaN(tempError)) continue;
+                    temp = new GompertzLawParams(i, bestB, bestRate);
+
+                    bestB = i;
+                    error = tempError;
+                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                }
+                
+                for (var i = 0.0001; i < 1; i = Math.Round(step+i,6))
+                {
+                    var tempError = CompareDataWithRealDataAbsoluteError(temp);
+                    
+                    if (tempError > error && !double.IsNaN(tempError)) continue;
+                    temp = new GompertzLawParams(bestA, i, bestRate);
+                    bestA = i;
+                    error = tempError;
+                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                }
+                
+                gompertzLawParams = new GompertzLawParams(bestA, bestB, bestRate);
+            }
+
+            fittingParams.Add(new FittingParameters(gompertzLawParams.ToString(),
+                CompareDataWithRealDataAbsoluteError(gompertzLawParams)));
+
+            return fittingParams;
+        }
 
         private static List<MortalityTableModelRaw> ComputeMortalityTableModelRaws(GompertzLawParams gompertzLawParams)
         {
             var raws = new List<MortalityTableModelRaw>();
-            double previusLx = PeopleNumber;
+            double previousLx = PeopleNumber;
             foreach (var i in Enumerable.Range(0, AgeLimit))
             {
                 var tableRaw = new MortalityTableModelRaw
                 {
-                    X = i, Lx = previusLx * ComputeGompertzCoef(gompertzLawParams, i)
+                    X = i, Lx = previousLx * ComputeGompertzCoef(gompertzLawParams, i)
                 };
 
                 tableRaw.Dx = tableRaw.Lx - tableRaw.Lx * ComputeGompertzCoef(gompertzLawParams, i + 1);
@@ -53,7 +138,7 @@ namespace MathModelingLab2.Services
                 tableRaw.Px = 1 - tableRaw.Qx;
                 tableRaw.CDx = tableRaw.Lx * Math.Pow((1 + gompertzLawParams.RatePercents), -i);
                 tableRaw.CCx = tableRaw.Dx * Math.Pow((gompertzLawParams.RatePercents + 1), -i + 1);
-                previusLx = tableRaw.Lx;
+                previousLx = tableRaw.Lx;
 
                 raws.Add(tableRaw);
             }
@@ -70,7 +155,15 @@ namespace MathModelingLab2.Services
             return raws;
         }
 
+        private double CompareDataWithRealDataAbsoluteError(GompertzLawParams gompertzLawParams)
+        {
+            var computedData = ComputeMortalityTableModelRaws(gompertzLawParams);
+
+            return Math.Round(FunctionsComputingService.ComputeAbsoluteError(computedData.Select(x => x.Lx).ToList(),
+                RealData.Select(x => x.Lx).ToList()),6);
+        }
+
         private static double ComputeGompertzCoef(GompertzLawParams gompertzLawParams, int x) =>
-            Math.Exp(-gompertzLawParams.Beta * (Math.Exp(gompertzLawParams.Alpha * x) - 1) / gompertzLawParams.Alpha);
+            Math.Exp(-gompertzLawParams.Beta * ((Math.Exp(gompertzLawParams.Alpha * x) - 1) / gompertzLawParams.Alpha));
     }
 }

@@ -7,54 +7,35 @@ using MathModelingLab2.Models;
 
 namespace MathModelingLab2.Services
 {
-    public class XLSService
+    public class XlsService
     {
-        private static string realDataPath = Directory.GetCurrentDirectory() + @"XLSs\RealData.xls";
+        private static readonly string RealDataPath = Directory.GetCurrentDirectory() + @"\XLSs\RealDataShrt.xlsx";
 
-        public RealDataTableView ReadXLS()
+        public static List<RealDataTableViewRaw> ReadXls()
         {
-            var realDataTableView = new RealDataTableView();
-
-            SpreadsheetInfo.SetLicense("FREE-LIMITED-KEY");
-            var workbook = ExcelFile.Load(realDataPath);
-
-            realDataTableView.RealDataTableClustersEnumerable = new List<RealDataTableView.RealDataTableClusters>
+            try
             {
-                new()
-                {
-                    Sex = "Woman",
-                    RealDataTableViewRaws = ExcelWorksheet(workbook.Worksheets.ElementAt(0))
-                },
-                new()
-                {
-                    Sex = "Man",
-                    RealDataTableViewRaws = ExcelWorksheet(workbook.Worksheets.ElementAt(1))
-                }
-            };
+                SpreadsheetInfo.SetLicense("FREE-LIMITED-KEY");
+                var workbook = ExcelFile.Load(RealDataPath);
+                //TODO: convert to LINQ after debug
 
-            return realDataTableView;
-        }
-
-        private static IEnumerable<RealDataTableView.RealDataTableViewRaw> ExcelWorksheet(ExcelWorksheet excelWorksheet)
-        {
-            var data = new List<RealDataTableView.RealDataTableViewRaw>();
-            foreach (var row in excelWorksheet.Rows)
-            {
-                if (row.AllocatedCells.ElementAt(2).ValueType == CellValueType.Null ||
-                    row.AllocatedCells.ElementAt(2).ValueType == CellValueType.String) continue;
-
-                data.Add(new RealDataTableView.RealDataTableViewRaw
-                {
-                    Year = Convert.ToDouble(row.AllocatedCells.ElementAt(1).Value),
-                    X = Convert.ToDouble(row.AllocatedCells.ElementAt(2).Value),
-                    Lx = Convert.ToDouble(row.AllocatedCells.ElementAt(3).Value),
-                    Dx = Convert.ToDouble(row.AllocatedCells.ElementAt(4).Value),
-                    Qx = Convert.ToDouble(row.AllocatedCells.ElementAt(5).Value),
-                    CCx = Convert.ToDouble(row.AllocatedCells.ElementAt(8).Value)
-                });
+                return (from row in workbook.Worksheets.ElementAt(0).Rows
+                    where row.AllocatedCells.ElementAt(0).ValueType != CellValueType.Null && row.AllocatedCells.ElementAt(0).ValueType != CellValueType.String
+                    select new RealDataTableViewRaw
+                    {
+                        Year = Convert.ToDouble(row.AllocatedCells.ElementAt(0).Value),
+                        X = Convert.ToDouble(row.AllocatedCells.ElementAt(1).Value),
+                        Lx = Convert.ToDouble(row.AllocatedCells.ElementAt(2).Value),
+                        Dx = Convert.ToDouble(row.AllocatedCells.ElementAt(3).Value),
+                        Qx = Convert.ToDouble(row.AllocatedCells.ElementAt(4).Value),
+                        CCx = Convert.ToDouble(row.AllocatedCells.ElementAt(7).Value)
+                    }).ToList();
             }
-
-            return data;
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

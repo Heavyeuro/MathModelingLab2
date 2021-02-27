@@ -13,8 +13,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="GemBox.Spreadsheet" Version="41.3.30.1018" />
+        <PackageReference Include="GemBox.Spreadsheet" Version="47.0.1095" />
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.3" />
+        <PackageReference Include="morelinq" Version="3.3.2" />
         <PackageReference Include="ScottPlot" Version="4.1.8-beta" />
     </ItemGroup>
 
@@ -24,6 +25,9 @@
         <None Remove="$(SpaRoot)**" />
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
         <None Update="XLSs\RealData.xls">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="XLSs\RealDataShrt.xlsx">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
