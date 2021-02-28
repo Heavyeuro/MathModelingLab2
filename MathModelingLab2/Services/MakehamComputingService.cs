@@ -20,12 +20,9 @@ namespace MathModelingLab2.Services
             RealData = XlsService.ReadXls();
         }
 
-        public async Task<MortalityTableModel> BuildMortalityTable(MakehamLawParams makehamLawParams)
+        public async Task<List<MortalityTableModelRaw>> BuildMortalityTable(MakehamLawParams makehamLawParams)
         {
-            return new()
-            {
-                MortalityTableModelRaws = ComputeMortalityTableModelRaws(makehamLawParams)
-            };
+            return ComputeMortalityTableModelRaws(makehamLawParams);
         }
 
         public async Task<string> CompareWithRealDataPlot(MakehamLawParams makehamLawParams)

@@ -2,11 +2,6 @@
 
 namespace MathModelingLab2.Models
 {
-    public class MortalityTableModel
-    {
-        public List<MortalityTableModelRaw> MortalityTableModelRaws { get; set; }
-    }
-    
     public class MortalityTableModelRaw
     {
         // Age

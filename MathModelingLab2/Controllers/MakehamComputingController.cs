@@ -18,22 +18,24 @@ namespace MathModelingLab2.Controllers
         }
 
         [HttpPost("GetMortalityTable")]
-        public async Task<IActionResult> GetMortalityTableGompertz([FromBody] MakehamLawParams makehamLawParams)
+        public async Task<IActionResult> GetMortalityTable([FromBody] MakehamLawParams makehamLawParams)
         {
             var table = await _makehamComputingService.BuildMortalityTable(makehamLawParams);
             return Ok(table);
         }
 
-        [HttpPost("GetPlot")]
-        public async Task<IActionResult> GetPlotGompertz([FromBody] MakehamLawParams makehamLawParams)
+        [HttpGet("GetPlot")]
+        public async Task<IActionResult> GetPlot(double alpha, double a, double b)
         {
+            var makehamLawParams = new MakehamLawParams(alpha, a, b);
             var path = await _makehamComputingService.BuildPlot(makehamLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
         
-        [HttpPost("CompareWithRealData")]
-        public async Task<IActionResult> CompareWithRealData([FromBody] MakehamLawParams makehamLawParams)
+        [HttpGet("CompareWithRealData")]
+        public async Task<IActionResult> CompareWithRealData(double alpha, double a, double b)
         {
+            var makehamLawParams = new MakehamLawParams(alpha, a, b);
             var path = await _makehamComputingService.CompareWithRealDataPlot(makehamLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
@@ -45,14 +47,14 @@ namespace MathModelingLab2.Controllers
             return Ok(absoluteError);
         }
         
-        [HttpPost("FindAbsoluteErrorTable")]
+        [HttpGet("FindAbsoluteErrorTable")]
         public async Task<IActionResult> FitParamsTable()
         {
             var absoluteError = await _makehamComputingService.FitParamsTable();
             return Ok(absoluteError);
         }
         
-        [HttpPost("FitParams")]
+        [HttpGet("FitParams")]
         public async Task<IActionResult> FitParams()
         {
             var optimalParameters  = await _makehamComputingService.FitParams();

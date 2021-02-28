@@ -17,22 +17,24 @@ namespace MathModelingLab2.Controllers
         }
 
         [HttpPost("GetMortalityTable")]
-        public async Task<IActionResult> GetMortalityTableGompertz([FromBody] GompertzLawParams gompertzLawParams)
+        public async Task<IActionResult> GetMortalityTable([FromBody] GompertzLawParams gompertzLawParams)
         {
             var table = await _gompertzComputingService.BuildMortalityTable(gompertzLawParams);
             return Ok(table);
         }
 
-        [HttpPost("GetPlot")]
-        public async Task<IActionResult> GetPlotGompertz([FromBody] GompertzLawParams gompertzLawParams)
+        [HttpGet("GetPlot")]
+        public async Task<IActionResult> GetPlot(double alpha, double beta, double ratePercents)
         {
+            var gompertzLawParams = new GompertzLawParams(alpha, beta, ratePercents);
             var path = await _gompertzComputingService.BuildPlot(gompertzLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
 
-        [HttpPost("CompareWithRealData")]
-        public async Task<IActionResult> CompareWithRealData([FromBody] GompertzLawParams gompertzLawParams)
-        {
+        [HttpGet("CompareWithRealData")]
+        public async Task<IActionResult> CompareWithRealData(double alpha, double beta, double ratePercents)
+        { 
+            var gompertzLawParams = new GompertzLawParams(alpha, beta, ratePercents);
             var path = await _gompertzComputingService.CompareWithRealDataPlot(gompertzLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
@@ -44,14 +46,14 @@ namespace MathModelingLab2.Controllers
             return Ok(absoluteError);
         }
 
-        [HttpPost("FindAbsoluteErrorTable")]
+        [HttpGet("FindAbsoluteErrorTable")]
         public async Task<IActionResult> FitParamsTable()
         {
             var absoluteError = await _gompertzComputingService.FitParamsTable();
             return Ok(absoluteError);
         }
 
-        [HttpPost("FitParams")]
+        [HttpGet("FitParams")]
         public async Task<IActionResult> FitParams()
         {
             var optimalParameters = await _gompertzComputingService.FitParams();

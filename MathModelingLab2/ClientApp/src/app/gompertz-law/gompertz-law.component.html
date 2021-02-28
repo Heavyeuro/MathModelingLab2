@@ -1,24 +1,45 @@
-<h1 id="tableLabel">Weather forecast</h1>
+<h1 id="tableLabel">Gompertz law</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<div class="row">
+  <div class="col-3">
+    Alpha <br> <input type="number" [(ngModel)]="alpha"> <br>
+    A <br> <input type="number" [(ngModel)]="beta"> <br>
+    B <br> <input type="number" [(ngModel)]="ratePercents"> <br>
 
-<p *ngIf="!forecasts"><em>Loading...</em></p>
+    <div class="row">
+      <button type="button" class="btn btn-info col-5" (click)="GetMortalityTable()">Mortality Table</button>
+      <button type="button" class="btn btn-info col-5 offset-1" (click)="GetPlot()">Plot</button>
+    </div>
+    <div class="row">
+      <button type="button" class="btn btn-info col-5" (click)="CompareWithRealData()">Compare Plot</button>
+      <button type="button" class="btn btn-info col-5 offset-1" (click)="FindAbsoluteError()">Absolute Error</button>
+    </div>
+    <div class="row">
+      <button type="button" class="btn btn-info col-5" (click)="FindAbsoluteErrorTable()">Find Absolute Error Table
+      </button>
+      <button type="button" class="btn btn-info col-5 offset-1" (click)="FitParams()">Fit Params</button>
+    </div>
 
-<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="forecasts">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Temp. (C)</th>
-      <th>Temp. (F)</th>
-      <th>Summary</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let forecast of forecasts">
-      <td>{{ forecast.date }}</td>
-      <td>{{ forecast.temperatureC }}</td>
-      <td>{{ forecast.temperatureF }}</td>
-      <td>{{ forecast.summary }}</td>
-    </tr>
-  </tbody>
-</table>
+  </div>
+  <div class="col-8">
+
+    <div [ngSwitch]="switcher">
+
+      <div *ngSwitchCase="1">
+      </div>
+      <div *ngSwitchCase="2">
+        <img src={{plotUrl}} alt="Plot" width="700" height="700">
+      </div>
+      <div *ngSwitchCase="3">
+        <img src={{plotUrl}} alt="Plot" width="700" height="700">
+      </div>
+      <div *ngSwitchCase="4">
+        <h3> Absolute Error: {{absoluteError}}</h3>
+      </div>
+      <div *ngSwitchCase="5">
+      </div>
+      <div *ngSwitchCase="6">
+      </div>
+    </div>
+  </div>
+</div>
