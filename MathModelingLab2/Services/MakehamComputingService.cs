@@ -145,15 +145,6 @@ namespace MathModelingLab2.Services
                 raws.Add(tableRaw);
             }
 
-            raws.ForEach(raw =>
-            {
-                for (var i = (int) raw.X; i < AgeLimit; i++)
-                {
-                    raw.CNx += raws.First(x => x.X == i).Dx;
-                    raw.CMx += raws.First(x => x.X == i).CCx;
-                }
-            });
-
             return raws;
         }
 

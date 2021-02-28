@@ -18,33 +18,29 @@ namespace MathModelingLab2.Controllers
         }
 
         [HttpPost("GetMortalityTable")]
-        public async Task<IActionResult> GetMortalityTableGompertz()
+        public async Task<IActionResult> GetMortalityTableGompertz([FromBody] MakehamLawParams makehamLawParams)
         {
-            var makehamLawParams = new MakehamLawParams(0.05615, 0.00273, 0.09);
             var table = await _makehamComputingService.BuildMortalityTable(makehamLawParams);
             return Ok(table);
         }
 
         [HttpPost("GetPlot")]
-        public async Task<IActionResult> GetPlotGompertz()
+        public async Task<IActionResult> GetPlotGompertz([FromBody] MakehamLawParams makehamLawParams)
         {
-            var makehamLawParams = new MakehamLawParams(0.05615, 0.00273, 0.09);
             var path = await _makehamComputingService.BuildPlot(makehamLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
         
         [HttpPost("CompareWithRealData")]
-        public async Task<IActionResult> CompareWithRealData()
+        public async Task<IActionResult> CompareWithRealData([FromBody] MakehamLawParams makehamLawParams)
         {
-            var makehamLawParams = new MakehamLawParams(0.000354, 0.00026544, 0.074);
             var path = await _makehamComputingService.CompareWithRealDataPlot(makehamLawParams);
             return PhysicalFile(path, "image/jpeg");
         }
         
         [HttpPost("FindAbsoluteError")]
-        public async Task<IActionResult> FindAbsoluteError()
+        public async Task<IActionResult> FindAbsoluteError([FromBody] MakehamLawParams makehamLawParams)
         {
-            var makehamLawParams = new MakehamLawParams(0.05615, 0.00273, 0.09);
             var absoluteError = await _makehamComputingService.CompareWithRealDataAbsoluteError(makehamLawParams);
             return Ok(absoluteError);
         }
