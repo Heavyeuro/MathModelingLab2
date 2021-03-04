@@ -43,12 +43,12 @@ namespace MathModelingLab2.Services
             return CompareDataWithRealDataAbsoluteError(makehamLawParams);
         }
 
-        public async Task<List<FittingParameters>> FitParamsTable()
+        public async Task<List<FittingParametersMakeham>> FitParamsTable()
         {
             return IterateParamsTable(0.005, 0.1);
         }
 
-        public async Task<FittingParameters> FitParams()
+        public async Task<FittingParametersMakeham> FitParams()
         {
             return IterateParamsTable(0.00002, 0.1).MinBy(x => x.AbsoluteError).First();
         }
@@ -73,9 +73,9 @@ namespace MathModelingLab2.Services
             return path;
         }
 
-        private List<FittingParameters> IterateParamsTable(double step, double range)
+        private List<FittingParametersMakeham> IterateParamsTable(double step, double range)
         {
-            var fittingParams = new List<FittingParameters>();
+            var fittingParams = new List<FittingParametersMakeham>();
 
             var bestA = 0.001;
             var bestB = 0.001;
@@ -94,7 +94,7 @@ namespace MathModelingLab2.Services
                     if (tempError > error && !double.IsNaN(tempError)) continue;
                     bestB = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                    fittingParams.Add(new FittingParametersMakeham(temp, error));
                 }
                 
                 for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
@@ -105,7 +105,7 @@ namespace MathModelingLab2.Services
                     if (tempError > error && !double.IsNaN(tempError)) continue;
                     bestA = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                    fittingParams.Add(new FittingParametersMakeham(temp, error));
                 }
                 
                 for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
@@ -116,7 +116,7 @@ namespace MathModelingLab2.Services
                     if (tempError > error && !double.IsNaN(tempError)) continue;
                     bestAlpha = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                    fittingParams.Add(new FittingParametersMakeham(temp, error));
                 }
             }
 

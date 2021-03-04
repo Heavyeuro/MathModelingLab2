@@ -43,12 +43,12 @@ namespace MathModelingLab2.Services
             return CompareDataWithRealDataAbsoluteError(gompertzLawParams);
         }
 
-        public async Task<List<FittingParameters>> FitParamsTable()
+        public async Task<List<FittingParametersGompertz>> FitParamsTable()
         {
             return IterateParamsTable(0.005, 0.1);
         }
 
-        public async Task<FittingParameters> FitParams()
+        public async Task<FittingParametersGompertz> FitParams()
         {
             return IterateParamsTable(0.00002, 0.1).MinBy(x => x.AbsoluteError).First();
         }
@@ -73,9 +73,9 @@ namespace MathModelingLab2.Services
             return path;
         }
 
-        private List<FittingParameters> IterateParamsTable(double step, double range)
+        private List<FittingParametersGompertz> IterateParamsTable(double step, double range)
         {
-            var fittingParams = new List<FittingParameters>();
+            var fittingParams = new List<FittingParametersGompertz>();
 
             var bestA = 0.001;
             var bestB = 0.001;
@@ -95,7 +95,7 @@ namespace MathModelingLab2.Services
 
                     bestB = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                    fittingParams.Add(new FittingParametersGompertz(temp, error));
                 }
                 
                 for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
@@ -106,7 +106,7 @@ namespace MathModelingLab2.Services
                     temp = new GompertzLawParams(bestA, i, bestRate);
                     bestA = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParameters(temp.ToString(), error));
+                    fittingParams.Add(new FittingParametersGompertz(temp, error));
                 }
             }
 
