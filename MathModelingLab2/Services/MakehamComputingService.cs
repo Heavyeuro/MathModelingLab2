@@ -50,7 +50,8 @@ namespace MathModelingLab2.Services
 
         public async Task<FittingParametersMakeham> FitParams()
         {
-            return IterateParamsTable(0.00002, 0.1).MinBy(x => x.AbsoluteError).First();
+            return IterateParamsTable(0.00001, 0.5)
+                .MinBy(x => x.AbsoluteError).First();
         }
 
         public async Task<string> BuildPlot(MakehamLawParams makehamLawParams)
@@ -64,6 +65,85 @@ namespace MathModelingLab2.Services
             });
         }
 
+        public List<FittingParametersMakeham> ComputeAParams(double step, double range)
+        {
+            var fittingParams = new List<FittingParametersMakeham>();
+            var bestA = 0.000101;
+            var bestAlpha = 0.11174;
+            var bestB = 0.000001;
+
+            for (var i = 0.000001; i < range; i = Math.Round(step + i, 6))
+            {
+                var temp = new MakehamLawParams(bestAlpha, i, bestB);
+                var tempError = CompareDataWithRealDataAbsoluteError(temp);
+
+                fittingParams.Add(new FittingParametersMakeham(temp, tempError));
+            }
+
+            return fittingParams;
+        }
+
+        public List<FittingParametersMakeham> ComputeBParams(double step, double range)
+        {   
+            var fittingParams = new List<FittingParametersMakeham>();
+            var bestA = 0.000101;
+            var bestAlpha = 0.11174;
+            var bestB = 0.000001;
+
+            for (var i = 0.00000001; i < range; i = Math.Round(step/10 + i, 8))
+            {
+               var temp = new MakehamLawParams(bestAlpha, bestA, i);
+                var tempError = CompareDataWithRealDataAbsoluteError(temp);
+
+                fittingParams.Add(new FittingParametersMakeham(temp, tempError));
+            }
+
+            return fittingParams;
+        }
+
+        public List<FittingParametersMakeham> ComputeAlphaParams(double step, double range)
+        {
+            var fittingParams = new List<FittingParametersMakeham>();
+            var bestA = 0.000101;
+            var bestAlpha = 0.11174;
+            var bestB = 0.000001;;
+
+            for (var i = 0.0001; i < 0.2; i = Math.Round(step*10 + i, 6))
+            {
+               var temp = new MakehamLawParams(i, bestA, bestB);
+                var tempError = CompareDataWithRealDataAbsoluteError(temp);
+
+                fittingParams.Add(new FittingParametersMakeham(temp, tempError));
+            }
+
+            return fittingParams;
+        }
+
+        public async Task<string> ParamsPlotComparison()
+        {
+            var step = 0.000001;
+            var range = 0.001;
+            var B = ComputeBParams(step, range);
+            var A = ComputeAParams(step, range);
+            var Alpha = ComputeAlphaParams(step, range);
+
+            var q = new List<PlotLine>
+            {
+                 new("B Dependency", B.Select(x => x.AbsoluteError).ToArray(),
+                     B.Select(x => x.MakehamLawParams.B).ToArray()),
+                // new("A Dependency", A.Select(x => x.AbsoluteError).ToArray(),
+                //      A.Select(x => x.MakehamLawParams.A).ToArray()),
+                  //new("Alpha Dependency", Alpha.Select(x => x.AbsoluteError).ToArray(),
+                    // Alpha.Select(x => x.MakehamLawParams.Alpha).ToArray())
+            };
+
+            var path = Directory.GetCurrentDirectory() + $"\\plots\\{Guid.NewGuid()}.png";
+
+            PlotService.PlotService.MakePlot(path, q, "Absolute error", "Parameter values");
+    
+            return path;
+        }
+
         private static string BuildPlot(List<PlotLine> plotLines)
         {
             var path = Directory.GetCurrentDirectory() + $"\\plots\\{Guid.NewGuid()}.png";
@@ -73,50 +153,51 @@ namespace MathModelingLab2.Services
             return path;
         }
 
-        private List<FittingParametersMakeham> IterateParamsTable(double step, double range)
+        private List<FittingParametersMakeham> IterateParamsTable(double step, double range, int loops = 2)
         {
             var fittingParams = new List<FittingParametersMakeham>();
 
             var bestA = 0.001;
             var bestB = 0.001;
-            var bestAlpha =  0.001;
+            var bestAlpha = 0.001;
             MakehamLawParams temp;
             var error = 1.0;
 
-            for (var j = 0; j < 2; j++)
+            for (var j = 0; j < loops; j++)
             {
-                
-                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
+                for (var i = 0.00001; i < range/100; i = Math.Round(step + i, 6))
                 {
                     temp = new MakehamLawParams(bestAlpha, bestA, i);
                     var tempError = CompareDataWithRealDataAbsoluteError(temp);
-                    
+                    fittingParams.Add(new FittingParametersMakeham(temp, tempError));
+
                     if (tempError > error && !double.IsNaN(tempError)) continue;
                     bestB = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParametersMakeham(temp, error));
                 }
-                
-                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
+
+                error = 1.0;
+                for (var i = 0.0001; i < 0.8; i = Math.Round(step + i, 6))
                 {
                     temp = new MakehamLawParams(bestAlpha, i, bestB);
                     var tempError = CompareDataWithRealDataAbsoluteError(temp);
+                    fittingParams.Add(new FittingParametersMakeham(temp, tempError));
                     
                     if (tempError > error && !double.IsNaN(tempError)) continue;
                     bestA = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParametersMakeham(temp, error));
                 }
-                
-                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
+
+                error = 1.0;
+                for (var i = 0.0001; i < range; i = Math.Round(step + i, 6))
                 {
                     temp = new MakehamLawParams(i, bestA, bestB);
                     var tempError = CompareDataWithRealDataAbsoluteError(temp);
-                    
+                    fittingParams.Add(new FittingParametersMakeham(temp, tempError));
+
                     if (tempError > error && !double.IsNaN(tempError)) continue;
                     bestAlpha = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParametersMakeham(temp, error));
                 }
             }
 
@@ -150,10 +231,11 @@ namespace MathModelingLab2.Services
             var computedData = ComputeMortalityTableModelRaws(makehamLawParams);
 
             return Math.Round(FunctionsComputingService.ComputeAbsoluteError(computedData.Select(x => x.Lx).ToList(),
-                RealData.Select(x => x.Lx).ToList()),6);
+                RealData.Select(x => x.Lx).ToList()), 6);
         }
 
         private static double ComputeMakehamCoef(MakehamLawParams makehamLawParams, int x) =>
-            Math.Exp(-makehamLawParams.A*x-((makehamLawParams.B*(Math.Exp(makehamLawParams.Alpha*x)-1))/makehamLawParams.Alpha));
+            Math.Exp(-makehamLawParams.A * x - ((makehamLawParams.B * (Math.Exp(makehamLawParams.Alpha * x) - 1)) /
+                                                makehamLawParams.Alpha));
     }
 }

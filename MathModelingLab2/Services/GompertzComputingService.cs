@@ -50,7 +50,7 @@ namespace MathModelingLab2.Services
 
         public async Task<FittingParametersGompertz> FitParams()
         {
-            return IterateParamsTable(0.00002, 0.1).MinBy(x => x.AbsoluteError).First();
+            return IterateParamsTable(0.000001, 0.5).MinBy(x => x.AbsoluteError).First();
         }
 
         public async Task<string> BuildPlot(GompertzLawParams gompertzLawParams)
@@ -72,41 +72,98 @@ namespace MathModelingLab2.Services
 
             return path;
         }
+        
+        public List<FittingParametersGompertz> ComputeBParams(double step, double range)
+        {
+            var fittingParams = new List<FittingParametersGompertz>();
 
-        private List<FittingParametersGompertz> IterateParamsTable(double step, double range)
+            var bestAlpha = 0.00022;
+            // var bestB = 0.00273;
+
+            for (var i = 0.00001; i < range/10; i = Math.Round(step + i, 6))
+            {
+               var temp = new GompertzLawParams(bestAlpha, i, bestAlpha);
+                var tempError = CompareDataWithRealDataAbsoluteError(temp);
+
+                fittingParams.Add(new FittingParametersGompertz(temp, tempError));
+            }
+
+            return fittingParams;
+        }
+
+        public List<FittingParametersGompertz> ComputeAlphaParams(double step, double range)
+        {
+            var fittingParams = new List<FittingParametersGompertz>();
+
+            var bestB = 0.0002;
+
+            for (var i = 0.0001; i < range; i = Math.Round( 0.0001+ i, 6))
+            {
+                var temp = new GompertzLawParams(i, bestB, bestB);
+                var tempError = CompareDataWithRealDataAbsoluteError(temp);
+
+                fittingParams.Add(new FittingParametersGompertz(temp, tempError));
+            }
+
+            return fittingParams;
+        }
+
+        public async Task<string> ParamsPlotComparison()
+        {
+            var step = 0.000001;
+            var range = 0.01;
+            var B = ComputeBParams(step, range);
+            // var Alpha = ComputeAlphaParams(step, 0.2);
+
+            var q = new List<PlotLine>
+            {
+                 new("B Dependency", B.Select(x => x.AbsoluteError).ToArray(),
+                     B.Select(x => x.GompertzLawParams.Beta).ToArray()),
+                // new("Alpha Dependency", Alpha.Select(x => x.AbsoluteError).ToArray(),
+                //     Alpha.Select(x => x.GompertzLawParams.Alpha).ToArray()),
+            };
+
+            var path = Directory.GetCurrentDirectory() + $"\\plots\\{Guid.NewGuid()}.png";
+
+            PlotService.PlotService.MakePlot(path, q, "Absolute error", "Parameter values");
+
+            return path;
+        }
+
+        private List<FittingParametersGompertz> IterateParamsTable(double step, double range, int loops = 2)
         {
             var fittingParams = new List<FittingParametersGompertz>();
 
             var bestA = 0.001;
             var bestB = 0.001;
             var bestRate =  0.001;
-            var temp = new GompertzLawParams(bestA, bestB, bestRate);
             var error = 1.0;
 
-            for (var j = 0; j < 2; j++)
+            for (var j = 0; j < loops; j++)
             {
                 
-                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
+                for (var i = 0.000001; i < range/100;i = Math.Round(step+i,6))
                 {
+                    var temp = new GompertzLawParams(i, bestB, bestRate);
                     var tempError = CompareDataWithRealDataAbsoluteError(temp);
                     
-                    if (tempError > error && !double.IsNaN(tempError)) continue;
-                    temp = new GompertzLawParams(i, bestB, bestRate);
+                    fittingParams.Add(new FittingParametersGompertz(temp, tempError));
 
-                    bestB = i;
-                    error = tempError;
-                    fittingParams.Add(new FittingParametersGompertz(temp, error));
-                }
-                
-                for (var i = 0.0001; i < range; i = Math.Round(step+i,6))
-                {
-                    var tempError = CompareDataWithRealDataAbsoluteError(temp);
-                    
                     if (tempError > error && !double.IsNaN(tempError)) continue;
-                    temp = new GompertzLawParams(bestA, i, bestRate);
                     bestA = i;
                     error = tempError;
-                    fittingParams.Add(new FittingParametersGompertz(temp, error));
+                }
+                
+                error = 1.0;
+                for (var i = 0.000001; i < range; i = Math.Round(step+i,6))
+                {
+                    var temp = new GompertzLawParams(bestA, i, bestRate);
+                    var tempError = CompareDataWithRealDataAbsoluteError(temp);
+                    fittingParams.Add(new FittingParametersGompertz(temp, tempError));
+                    
+                    if (tempError > error && !double.IsNaN(tempError)) continue;
+                    bestB = i;
+                    error = tempError;
                 }
             }
 

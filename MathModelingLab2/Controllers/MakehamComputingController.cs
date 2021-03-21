@@ -27,8 +27,9 @@ namespace MathModelingLab2.Controllers
         [HttpGet("GetPlot")]
         public async Task<IActionResult> GetPlot(double alpha, double a, double b)
         {
-            var makehamLawParams = new MakehamLawParams(alpha, a, b);
-            var path = await _makehamComputingService.BuildPlot(makehamLawParams);
+            // var makehamLawParams = new MakehamLawParams(alpha, a, b);
+            // var path = await _makehamComputingService.BuildPlot(makehamLawParams);
+            var path = await _makehamComputingService.ParamsPlotComparison();
             return PhysicalFile(path, "image/jpeg");
         }
         
