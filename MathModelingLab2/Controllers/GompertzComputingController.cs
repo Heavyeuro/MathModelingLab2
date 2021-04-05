@@ -26,9 +26,9 @@ namespace MathModelingLab2.Controllers
         [HttpGet("GetPlot")]
         public async Task<IActionResult> GetPlot(double alpha, double beta, double ratePercents)
         {
-            // var gompertzLawParams = new GompertzLawParams(alpha, beta, ratePercents);
-            // var path = await _gompertzComputingService.BuildPlot(gompertzLawParams);
-            var path = await _gompertzComputingService.ParamsPlotComparison();
+            var gompertzLawParams = new GompertzLawParams(alpha, beta, ratePercents);
+            var path = await _gompertzComputingService.BuildPlot(gompertzLawParams);
+            // var path = await _gompertzComputingService.ParamsPlotComparison();
             return PhysicalFile(path, "image/jpeg");
         }
 

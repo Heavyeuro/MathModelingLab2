@@ -24,7 +24,7 @@ export class MakehamLawComponent {
 
   GetMortalityTable() {
     var makehamLawParams: MakehamLawParams = {Alpha: this.alpha, A: this.a, B: this.b};
-    this.http.post<any>('https://localhost:5001/api/MakehamComputing/GetMortalityTable', makehamLawParams).subscribe(data => {
+    this.http.post<MortalityTableModel>('https://localhost:5001/api/MakehamComputing/GetMortalityTable', makehamLawParams).subscribe(data => {
       this.mortalityTableModels = data;
       console.log(this.mortalityTableModels);
       this.switcher = 1;

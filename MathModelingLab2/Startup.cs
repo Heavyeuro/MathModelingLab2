@@ -25,6 +25,7 @@ namespace MathModelingLab2
             services.AddTransient<GompertzComputingService>();
             services.AddTransient<MakehamComputingService>();
             services.AddTransient<RealDataComputingService>();
+            services.AddTransient<GompertzKramarService>();
             services.AddSingleton<PlotService.PlotService>();
             services.AddSingleton<XlsService>();
             
