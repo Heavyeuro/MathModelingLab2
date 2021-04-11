@@ -10,10 +10,12 @@ namespace MathModelingLab2.Controllers
     public class MiscComputingController : ControllerBase
     {
         private GompertzKramarService _kramarService;
+        private ShortTermInsuranceService _insuranceService;
 
-        public MiscComputingController(GompertzKramarService _gompertzComputingService)
+        public MiscComputingController(GompertzKramarService _gompertzComputingService, ShortTermInsuranceService insuranceService)
         {
             _kramarService = _gompertzComputingService;
+            _insuranceService = insuranceService;
         }
 
         [HttpGet("FitParams")]
@@ -21,6 +23,14 @@ namespace MathModelingLab2.Controllers
         {
             var optimalParameters = _kramarService.ComputeAllParams();
             return Ok(optimalParameters);
+        }
+        
+        [HttpGet("STIPlot")]
+        public async Task<IActionResult> STIPlot()
+        {
+            var STM = new ShortTermInsuranceService.ShortTermModel{U = 100000,V = 20,BThreshold = 45000,NThreshold = 25000};
+            var path = _insuranceService.DrawPlot(STM);
+            return PhysicalFile(path, "image/jpeg");
         }
     }
 }
