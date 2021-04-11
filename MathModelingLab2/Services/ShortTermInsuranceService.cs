@@ -2,29 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MathModelingLab2.Models;
 using MathModelingLab2.PlotService;
-using MoreLinq.Extensions;
 
 namespace MathModelingLab2.Services
 {
     public class ShortTermInsuranceService
     {
-        public class ShortTermModel
-        {
-            // Initial capital
-            public double U { get; set; }
-            
-            // Number of claims
-            public int V { get; set; }
-            
-            // Minimal compensation
-            public int NThreshold { get; set; }
-            
-            // Maximal compensation
-            public int BThreshold { get; set; } 
-        }
-
         private ShortTermModel STM { get; set; }
         
         // Number of policyholders
@@ -39,10 +22,8 @@ namespace MathModelingLab2.Services
         // Coeffs in rage -5% to 10%
         private Queue<double> InflationCoefs { get; set; }
         
-        //
         private List<double> Ps { get; set; }
         
-        //
         private List<double> Bs { get; set; }
         
         // Insurance case compensation
@@ -106,5 +87,21 @@ namespace MathModelingLab2.Services
             
             return beforeInflation / inflationCoef;
         }
+        
+        public class ShortTermModel
+        {
+            // Initial capital
+            public double U { get; set; }
+            
+            // Number of claims
+            public int V { get; set; }
+            
+            // Minimal compensation
+            public int NThreshold { get; set; }
+            
+            // Maximal compensation
+            public int BThreshold { get; set; } 
+        }
+
     }
 }
