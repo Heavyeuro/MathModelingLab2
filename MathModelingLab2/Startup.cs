@@ -27,6 +27,7 @@ namespace MathModelingLab2
             services.AddTransient<RealDataComputingService>();
             services.AddTransient<ShortTermInsuranceService>();
             services.AddTransient<GompertzKramarService>();
+            services.AddTransient<PersonalSavingsService>();
             services.AddSingleton<PlotService.PlotService>();
             services.AddSingleton<XlsService>();
             
