@@ -30,7 +30,7 @@ namespace MathModelingLab2.Controllers
         [HttpGet("STIPlot")]
         public async Task<IActionResult> STIPlot()
         {
-            var STM = new ShortTermInsuranceService.ShortTermModel{U = 100000,V = 20,BThreshold = 45000,NThreshold = 25000};
+            var STM = new ShortTermInsuranceService.InputShortTermModel { Q = 0.003, BThreshold = 45000, NThreshold = 25000 };
             var path = _insuranceService.DrawPlot(STM);
             return PhysicalFile(path, "image/jpeg");
         }
